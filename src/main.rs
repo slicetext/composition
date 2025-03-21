@@ -1,4 +1,5 @@
-use std::collections::BTreeMap;
+use std::{collections::BTreeMap, fs::{self, File}, io::{prelude, BufReader}, path::PathBuf};
+use clap::Parser;
 
 struct ReplaceTable {
     values: BTreeMap<String, (bool, String, String, bool)>,
@@ -76,17 +77,27 @@ impl ReplaceTable {
         return html + "</html>";
     }
 }
+#[derive(Parser,Debug)]
+#[command(about="md-rs, a markdown to html compiler",long_about = None,version)]
+struct Args {
+    /// Markdown file to compile
+    markdown: PathBuf,
+    /// Name of Output HTML file
+    output: Option<String>,
+}
 fn main() {
+    let args = Args::parse();
     let mut rtable: ReplaceTable = ReplaceTable::new();
-    println!("{}",rtable.replace("# Heading\n\
-            Boring text *important text* \n\
-            ## Second Heading\n\
-            Pretty ** _cool_ **, right?\n\
-            ```\n\
-            <strong></strong>\n\
-            ```\n\
-            ~~strikethrough~~\n\
-            +Item one\n\
-            +Item two\n\
-            +Item three"));
+    let md = args.markdown;
+    let md_contents = fs::read_to_string(md)
+        .expect("Failed to read Markdown File");
+    let html = rtable.replace(md_contents.as_str());
+    let html_fp;
+    if let Some(fp) = args.output.as_deref() {
+        html_fp = fp.to_owned();
+    } else {
+        html_fp = String::from("md_rs_output.html");
+        println!("Writing to md_rs_output.html");
+    }
+    let _ = fs::write(html_fp, html).expect("Failed to write file");
 }
