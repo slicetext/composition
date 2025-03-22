@@ -1,4 +1,4 @@
-use std::{collections::BTreeMap, fs::{self, File}, io::{prelude, BufReader}, path::PathBuf};
+use std::{collections::BTreeMap, fs::{self}, path::PathBuf};
 use clap::Parser;
 
 struct ReplaceTable {
@@ -21,6 +21,10 @@ impl ReplaceTable {
         val.insert("~~", "<del>", false, "</del>");
         val.insert("#", "<h1>", true, "</h1>");
         val.insert("##", "<h2>", true, "</h2>");
+        val.insert("###", "<h3>", true, "</h3>");
+        val.insert("####", "<h4>", true, "</h4>");
+        val.insert("#####", "<h5>", true, "</h5>");
+        val.insert("######", "<h6>", true, "</h6>");
         val.insert("`", "<code>", false, "</code>");
         val.insert("```", "<pre><code>", false, "</code></pre>");
         return val;
@@ -85,6 +89,8 @@ struct Args {
     /// Name of Output HTML file
     output: Option<String>,
 }
+const COLOR_YELLOW: &str = "\x1b[1;93m";
+const COLOR_RESET: &str = "\x1b[0m";
 fn main() {
     let args = Args::parse();
     let mut rtable: ReplaceTable = ReplaceTable::new();
@@ -97,7 +103,7 @@ fn main() {
         html_fp = fp.to_owned();
     } else {
         html_fp = String::from("md_rs_output.html");
-        println!("Writing to md_rs_output.html");
+        println!("{}Writing to md_rs_output.html{}",COLOR_YELLOW,COLOR_RESET);
     }
     let _ = fs::write(html_fp, html).expect("Failed to write file");
 }
