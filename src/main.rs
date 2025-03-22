@@ -82,7 +82,7 @@ impl ReplaceTable {
     }
 }
 #[derive(Parser,Debug)]
-#[command(about="md-rs, a markdown to html compiler",long_about = None,version)]
+#[command(about="Composition, a markdown to html compiler",long_about = None,version)]
 struct Args {
     /// Markdown file to compile
     markdown: PathBuf,
